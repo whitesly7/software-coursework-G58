@@ -37,7 +37,7 @@ public class HelpPage extends JFrame {
             questionAnswer.setLayout(null);
             questionAnswer.setBackground(new Color(255, 255, 0, 64));
             questionAnswer.setBounds(200, 50, 250, 300);
-            JLabel questionTitle = new JLabel("Some Questions and Answers");
+            JLabel questionTitle = new JLabel("Questions & Answers");
             questionTitle.setFont(new Font("Serif", Font.BOLD, 18));
             questionTitle.setBounds(10, 10, 230, 30);
             questionAnswer.add(questionTitle);
@@ -107,8 +107,8 @@ public class HelpPage extends JFrame {
             });
             returnButton.setBounds(350, 380, 300, 50);
             returnButton.setBackground(new Color(82, 161, 242));
-            returnButton.setBorder(null);
-            returnButton.setForeground(Color.WHITE);
+           
+            returnButton.setForeground(Color.black);
             returnButton.setFont(new Font("Serif", Font.BOLD, 20));
             mainPanel.add(returnButton);
 
