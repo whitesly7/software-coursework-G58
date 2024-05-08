@@ -1,5 +1,5 @@
 /*
-	编译命令javac -cp json-20210307.jar TBChild.java
+	编译命令javac -cp json-20210307.jar TBChild.java TBParent.java AcceptedTasks.java
  	运行命令java -cp .;json-20210307.jar TBChild
  	运行前提注意：你需要保证json库和TBChild在同一个文件下
  	parent view进入密码为123456
@@ -41,7 +41,7 @@ public class TBChild extends JFrame {
 
         try {
         // 加载背景图像
-        BufferedImage backgroundImage = ImageIO.read(new File("../background.jpg"));
+        BufferedImage backgroundImage = ImageIO.read(new File("background.jpg"));
 
         // 创建面板
         JPanel panel = new JPanel() {
@@ -71,7 +71,7 @@ public class TBChild extends JFrame {
         upperPanel.setLayout(new GridBagLayout());
 
         // 创建左侧头像图标
-		ImageIcon originalIcon = new ImageIcon("../profilepic.jpg");
+		ImageIcon originalIcon = new ImageIcon("profilepic.jpg");
 		Image originalImage = originalIcon.getImage();
 		Image scaledImage = originalImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 		ImageIcon scaledIcon = new ImageIcon(scaledImage);
@@ -126,6 +126,7 @@ public class TBChild extends JFrame {
         		JSONObject taskObject = tasksArray.getJSONObject(i);
        			String taskTitle = taskObject.getString("title");
        			String taskDescription=taskObject.getString("description");
+                String taskLable = taskObject.getString("labels");
 
         		// 创建任务便签面板
         		JPanel taskCard = new JPanel() {
@@ -152,6 +153,7 @@ public class TBChild extends JFrame {
         		taskCard.setLayout(new GridBagLayout());
         		JLabel taskLabel = new JLabel(taskTitle);
         		JLabel taskLabel2 = new JLabel(taskDescription);
+                JLabel taskL = new JLabel(taskLable);
         		taskLabel.setFont(taskLabel.getFont().deriveFont(18.0f)); // 设置字体大小为18
         		taskLabel2.setFont(taskLabel2.getFont().deriveFont(17.0f)); // 设置字体大小为17
 				JButton acceptButton = new JButton("Accept");
@@ -171,8 +173,13 @@ public class TBChild extends JFrame {
         		gbc2.weighty = 1;
         		taskCard.add(taskLabel2, gbc2);
 
+                //taskLabel
+                gbc2.gridy = 2;
+                gbc.insets = new Insets(0, 0, 10, 5);
+                taskCard.add(taskL, gbc2);
+
         		//parent view Button
-        		gbc2.gridy = 2;
+        		gbc2.gridy = 3;
      		    gbc2.weighty = 0.0;
      		    gbc2.insets = new Insets(0, 0, 10, 0); // 设置按钮底部的边距
      		    
@@ -280,7 +287,9 @@ public void parentButtonClick(ActionEvent e) {
                 // 密码正确，执行相应操作
                 System.out.println("Password correct. Parent view accessed.");
                 // 弹出parent view界面……
-
+                ((Window) SwingUtilities.getRoot(submitButton)).dispose();
+                //((Window) SwingUtilities.getRoot()).dispose();
+                new TBParent();
                 // 关闭对话框
                 dialog.dispose();
             } else {
