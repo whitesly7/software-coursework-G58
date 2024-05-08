@@ -23,6 +23,9 @@ import java.awt.geom.Ellipse2D;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 public class TBParent extends JFrame{
     //TBCParentMethod tbc; // 创建TBCMethod的实例
     public TBParent() {
@@ -191,7 +194,7 @@ public class TBParent extends JFrame{
         		
         		taskPanel.add(taskCard);
 
-                //调用method类里的弹窗方法（失败）
+                //打开编辑任务界面
                 editButton.addMouseListener(new MouseListener(){
                     @Override
                     public void mouseClicked(MouseEvent e){
@@ -204,6 +207,21 @@ public class TBParent extends JFrame{
                         newFrame.setSize(1000, 500); 
                         newFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
                         newFrame.setVisible(true);
+                        //创建panel并加入newframe
+                        JPanel panelnew = new JPanel() {
+                            @Override
+                            protected void paintComponent(Graphics g) {
+                                super.paintComponent(g);
+                                // 绘制背景图像
+                                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                                // 绘制半透明层
+                                g.setColor(new Color(255, 255, 255, 128));//白色矩形作为遮罩
+                                g.fillRect(0, 0, getWidth(), getHeight());
+                            }
+                        };
+                        newFrame.add(panelnew);
+                        //黄色标题栏，直接用之前定义的黄色标题栏，加入就可以
+                        panelnew.add(yellowPanel, BorderLayout.NORTH);
                     } 
                     @Override
                     public void mouseEntered(MouseEvent e) {
@@ -224,6 +242,7 @@ public class TBParent extends JFrame{
                 });
 
                 //点击delete按钮，跳转到删除界面
+                
                 deleteButton.addMouseListener(new MouseListener(){
                     @Override
                     public void mouseClicked(MouseEvent e){
@@ -232,7 +251,22 @@ public class TBParent extends JFrame{
                         // 设置新窗口的属性，如大小、位置等  
                         newFrame.setSize(1000, 500);  
                         newFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
-                        newFrame.setVisible(true);
+                        newFrame.setVisible(true);  
+                        //创建panel并加入newframe
+                        JPanel panelnew = new JPanel() {
+                            @Override
+                            protected void paintComponent(Graphics g) {
+                                super.paintComponent(g);
+                                // 绘制背景图像
+                                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                                // 绘制半透明层
+                                g.setColor(new Color(255, 255, 255, 128));//白色矩形作为遮罩
+                                g.fillRect(0, 0, getWidth(), getHeight());
+                            }
+                        };
+                        newFrame.add(panelnew);
+                        //黄色标题栏，直接用之前定义的黄色标题栏，加入就可以
+                        panelnew.add(yellowPanel, BorderLayout.NORTH);
                     } 
                     @Override
                     public void mouseEntered(MouseEvent e) {
@@ -260,7 +294,16 @@ public class TBParent extends JFrame{
 
         
         //点击右上方accepted按钮，跳转到已经接受的任务界面
-        button.addMouseListener(new MouseListener(){
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                // 关闭删除窗口
+                ((Window) SwingUtilities.getRoot(button)).dispose();
+
+                 // 打开接受任务页面
+                new AcceptedTasks();
+                }
+        });
+        /*button.addMouseListener(new MouseListener(){
             @Override
             public void mouseClicked(MouseEvent e){
                System.out.println("已打开接取任务页面");
@@ -287,7 +330,7 @@ public class TBParent extends JFrame{
             @Override
             public void mouseReleased(MouseEvent e) {
             }
-        });
+        });*/
 
         // 设置taskPanel在upperPanel中占据更多的比例
         gbc.gridx = 0;
@@ -319,5 +362,17 @@ public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
         new TBParent();
     });
+    //TBCParentMethod newFrame = new TBCParentMethod();
 }
+
+//试下封到方法里再调用，试了不行
+public void method(){
+    try{
+            BufferedImage backgroundImage = ImageIO.read(new File("background.jpg"));
+        }catch (IOException e1) {
+        //  e1.printStackTrace();
+            System.out.println("很好，数据卡在文件里了，读不到java里");
+        } 
+}
+
 }
