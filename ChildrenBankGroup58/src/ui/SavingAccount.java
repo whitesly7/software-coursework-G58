@@ -41,24 +41,23 @@ public class SavingAccount extends JFrame{
             String[] saving1 = {
                 "The minimum deposit:",
                 "1 year& 100RMB",
-                "The annual interest rate is",
-                "1.51%."
+                "The annual interest rate is 1.51%."
+                
             };
                 
             
             for (int i = 0; i < saving1.length; i++) {
                 String saving = saving1[i];
                 JLabel savingLabel = new JLabel(saving);
-                savingLabel.setForeground(Color.ORANGE);
+                savingLabel.setForeground(Color.BLACK);
                 savingLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 savingLabel.setBounds(20, 50 + i * 30, 230, 30);
                 Saving1.add(savingLabel);
             }
 
             JButton chooseButton=new JButton("Choose!");
-            chooseButton.addActionListener(this::FinishButtonClick);
-
             Saving1.add(chooseButton);
+           
             mainPanel.add(Saving1);
 
             JPanel Saving2 = new JPanel();
@@ -69,14 +68,13 @@ public class SavingAccount extends JFrame{
             String[] saving2 = {
                 "The minimum deposit:",
                 "2 year& 500RMB",
-                "The annual interest rate is",
-                "3.11%"
+                "The annual interest rate is 3.11%"
             };
 
             for (int i = 0; i < saving2.length; i++) {
                 String saving = saving2[i];
                 JLabel savingLabel = new JLabel(saving);
-                savingLabel.setForeground(Color.ORANGE);
+                savingLabel.setForeground(Color.BLACK);
                 savingLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 savingLabel.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
@@ -97,12 +95,11 @@ public class SavingAccount extends JFrame{
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "Returning to homepage.");
                     // Add action to return to homepage
-                    new Home();
+                    
                 }
             });
             returnButton.setBounds(350, 380, 300, 50);
             returnButton.setBackground(new Color(82, 161, 242));
-           
             returnButton.setForeground(Color.black);
             returnButton.setFont(new Font("Serif", Font.BOLD, 20));
             mainPanel.add(returnButton);
@@ -144,7 +141,7 @@ public class SavingAccount extends JFrame{
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new HelpPage();
+            new SavingAccount();
         });
     }
 }
