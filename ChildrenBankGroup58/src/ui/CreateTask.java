@@ -149,6 +149,8 @@ public class CreateTask extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Implement submit action
                 JOptionPane.showMessageDialog(null, "Submit button clicked");
+                ((Window) SwingUtilities.getRoot(submitButton)).dispose();
+                new TBParent();
             }
         });
         buttonPanel.add(submitButton);
@@ -157,8 +159,8 @@ public class CreateTask extends JFrame {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Implement cancel action
                 dispose(); // Close the window
+                new TBParent();
             }
         });
         buttonPanel.add(cancelButton);

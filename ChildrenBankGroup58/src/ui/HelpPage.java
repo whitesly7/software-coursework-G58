@@ -103,6 +103,7 @@ public class HelpPage extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "Returning to homepage.");
                     // Add action to return to homepage
+                    new Home();
                 }
             });
             returnButton.setBounds(350, 380, 300, 50);
@@ -128,24 +129,3 @@ public class HelpPage extends JFrame {
         });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 /*
-	编译命令javac -cp json-20210307.jar TBChild.java TBParent.java AcceptedTasks.java
- 	运行命令java -cp .;json-20210307.jar TBChild
+	编译命令javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java
+    这样才能实现跳转
+ 	运行命令java -cp .:json-20210307.jar TBChild
  	运行前提注意：你需要保证json库和TBChild在同一个文件下
  	parent view进入密码为123456
 */
@@ -21,7 +22,7 @@ import java.awt.geom.Ellipse2D;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.awt.event.ActionEvent;			//有个问题，这俩库有什么不同
+import java.awt.event.ActionEvent;			
 import java.awt.event.ActionListener;
 
 /*方法概述
@@ -87,7 +88,9 @@ public class TBChild extends JFrame {
         // 创建右侧按钮
         JButton parentButton = new JButton("parent view");
         parentButton.setBackground(Color.PINK);
-        parentButton.addActionListener(this::parentButtonClick);//为parent button设置监听方法
+        // 实现parent button 跳转功能
+        parentButton.addActionListener(this::parentButtonClick);
+
 
         // 将左侧头像、中间提示栏和右侧按钮添加到上方区域面板
         GridBagConstraints gbc = new GridBagConstraints();
@@ -126,7 +129,6 @@ public class TBChild extends JFrame {
         		JSONObject taskObject = tasksArray.getJSONObject(i);
        			String taskTitle = taskObject.getString("title");
        			String taskDescription=taskObject.getString("description");
-                String taskLable = taskObject.getString("labels");
 
         		// 创建任务便签面板
         		JPanel taskCard = new JPanel() {
@@ -153,7 +155,6 @@ public class TBChild extends JFrame {
         		taskCard.setLayout(new GridBagLayout());
         		JLabel taskLabel = new JLabel(taskTitle);
         		JLabel taskLabel2 = new JLabel(taskDescription);
-                JLabel taskL = new JLabel(taskLable);
         		taskLabel.setFont(taskLabel.getFont().deriveFont(18.0f)); // 设置字体大小为18
         		taskLabel2.setFont(taskLabel2.getFont().deriveFont(17.0f)); // 设置字体大小为17
 				JButton acceptButton = new JButton("Accept");
@@ -173,13 +174,8 @@ public class TBChild extends JFrame {
         		gbc2.weighty = 1;
         		taskCard.add(taskLabel2, gbc2);
 
-                //taskLabel
-                gbc2.gridy = 2;
-                gbc.insets = new Insets(0, 0, 10, 5);
-                taskCard.add(taskL, gbc2);
-
         		//parent view Button
-        		gbc2.gridy = 3;
+        		gbc2.gridy = 2;
      		    gbc2.weighty = 0.0;
      		    gbc2.insets = new Insets(0, 0, 10, 0); // 设置按钮底部的边距
      		    
@@ -188,10 +184,27 @@ public class TBChild extends JFrame {
         		taskPanel.add(taskCard);
     		}
 		} catch (IOException e) {
-    	//	e.printStackTrace();
-    		System.out.println("很好，数据卡在文件里了，读不到java里");
+    		System.out.println("error");
 		}
 
+        // 创建下方区域面板（创建新的task以及返回child界面）
+        JPanel lowerPanel = new JPanel();
+        lowerPanel.setOpaque(false); // 设置面板透明
+        lowerPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbclow = new GridBagConstraints();
+        
+        JButton backButton = new JButton("Return to HomePage");
+        backButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e){
+            // 关闭窗口
+            ((Window) SwingUtilities.getRoot(backButton)).dispose();
+            // 打开主页面
+            new Home();
+            }
+        });
+        // 将button加入下方区域面板
+        gbclow.gridx = 0;
+        lowerPanel.add(backButton, gbclow);
 
         // 设置taskPanel在upperPanel中占据更多的比例
         gbc.gridx = 0;
@@ -206,6 +219,7 @@ public class TBChild extends JFrame {
         // 将黄色标题栏、上方区域面板添加到面板
         panel.add(yellowPanel, BorderLayout.NORTH);
         panel.add(upperPanel, BorderLayout.CENTER);
+        panel.add(lowerPanel,BorderLayout.SOUTH);
 
         // 将面板添加到窗口
         add(panel);
@@ -287,8 +301,6 @@ public void parentButtonClick(ActionEvent e) {
                 // 密码正确，执行相应操作
                 System.out.println("Password correct. Parent view accessed.");
                 // 弹出parent view界面……
-                ((Window) SwingUtilities.getRoot(submitButton)).dispose();
-                //((Window) SwingUtilities.getRoot()).dispose();
                 new TBParent();
                 // 关闭对话框
                 dialog.dispose();

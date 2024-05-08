@@ -1,6 +1,7 @@
 /*
-	编译命令javac -cp json-20210307.jar TBParent.java
- 	运行命令java -cp .;json-20210307.jar TBParent
+	编译命令javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java
+    这样才能实现跳转
+ 	运行命令java -cp .:json-20210307.jar TBParent
  	运行前提注意：你需要保证json库和TBChild在同一个文件下
 */
 
@@ -106,6 +107,26 @@ public class TBParent extends JFrame{
         // 创建两个button
         JButton createNewTaskButton = new JButton("Create New!");
         JButton backButton = new JButton("Back to Children's View");
+
+        createNewTaskButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                // 关闭窗口
+                ((Window) SwingUtilities.getRoot(backButton)).dispose();
+
+                 // 打开新建任务页面
+                new CreateTask();
+            }
+        });
+
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                // 关闭窗口
+                ((Window) SwingUtilities.getRoot(backButton)).dispose();
+
+                 // 打开孩子页面
+                new TBChild();
+                }
+        });
         // 将button加入下方区域面板
         gbclow.gridx = 0;
         lowerPanel.add(createNewTaskButton, gbclow);
@@ -159,8 +180,22 @@ public class TBParent extends JFrame{
         		JLabel taskT = new JLabel(taskTitle);
         		JLabel taskContent = new JLabel(taskDescription);
                 JLabel taskL = new JLabel(taskLabel);
-				JButton editButton = new JButton("Edit");
+				
+                //编辑页面跳转
+                JButton editButton = new JButton("Edit");
+                editButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e){
+                        // 关闭窗口
+                        ((Window) SwingUtilities.getRoot(backButton)).dispose();
+        
+                         // 打开创建页面
+                        new CreateTask();
+                        }
+                    });
+                
+                //删除按钮反应
                 JButton deleteButton = new JButton("Delete");
+                deleteButton.addActionListener(this::deleteButtonAction);
 
         		GridBagConstraints gbc2 = new GridBagConstraints();
         		//taskLabel
@@ -193,99 +228,6 @@ public class TBParent extends JFrame{
                 taskCard.add(deleteButton, gbc2);
         		
         		taskPanel.add(taskCard);
-
-                //打开编辑任务界面
-                editButton.addMouseListener(new MouseListener(){
-                    @Override
-                    public void mouseClicked(MouseEvent e){
-                       System.out.println("已打开编辑任务页面");
-                       //tbc = new TBCParentMethod();
-                       //tbc.setVisible(true);
-                       //tbcMethod.navigateToNewPage();
-                       JFrame newFrame = new JFrame("EditTasks");  
-                        // 设置新窗口的属性，如大小、位置等  
-                        newFrame.setSize(1000, 500); 
-                        newFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
-                        newFrame.setVisible(true);
-                        //创建panel并加入newframe
-                        JPanel panelnew = new JPanel() {
-                            @Override
-                            protected void paintComponent(Graphics g) {
-                                super.paintComponent(g);
-                                // 绘制背景图像
-                                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                                // 绘制半透明层
-                                g.setColor(new Color(255, 255, 255, 128));//白色矩形作为遮罩
-                                g.fillRect(0, 0, getWidth(), getHeight());
-                            }
-                        };
-                        newFrame.add(panelnew);
-                        //黄色标题栏，直接用之前定义的黄色标题栏，加入就可以
-                        panelnew.add(yellowPanel, BorderLayout.NORTH);
-                    } 
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        
-                    }
-         
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                    }
-         
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                    }
-         
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                    }
-                });
-
-                //点击delete按钮，跳转到删除界面
-                
-                deleteButton.addMouseListener(new MouseListener(){
-                    @Override
-                    public void mouseClicked(MouseEvent e){
-                       System.out.println("已打开删除任务页面");
-                       JFrame newFrame = new JFrame("DeleteTasks");  
-                        // 设置新窗口的属性，如大小、位置等  
-                        newFrame.setSize(1000, 500);  
-                        newFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
-                        newFrame.setVisible(true);  
-                        //创建panel并加入newframe
-                        JPanel panelnew = new JPanel() {
-                            @Override
-                            protected void paintComponent(Graphics g) {
-                                super.paintComponent(g);
-                                // 绘制背景图像
-                                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                                // 绘制半透明层
-                                g.setColor(new Color(255, 255, 255, 128));//白色矩形作为遮罩
-                                g.fillRect(0, 0, getWidth(), getHeight());
-                            }
-                        };
-                        newFrame.add(panelnew);
-                        //黄色标题栏，直接用之前定义的黄色标题栏，加入就可以
-                        panelnew.add(yellowPanel, BorderLayout.NORTH);
-                    } 
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        
-                    }
-         
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                    }
-         
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                    }
-         
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                    }
-                });
-                
     		}
 		} catch (IOException e) {
     	//	e.printStackTrace();
@@ -303,34 +245,6 @@ public class TBParent extends JFrame{
                 new AcceptedTasks();
                 }
         });
-        /*button.addMouseListener(new MouseListener(){
-            @Override
-            public void mouseClicked(MouseEvent e){
-               System.out.println("已打开接取任务页面");
-               //tbcMethod.navigateToNewPage();
-               JFrame newFrame = new JFrame("AcceptedTasks");  
-                // 设置新窗口的属性，如大小、位置等  
-                newFrame.setSize(1000, 500);  
-                newFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
-                newFrame.setVisible(true);
-            } 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                
-            }
- 
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
- 
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
- 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-        });*/
 
         // 设置taskPanel在upperPanel中占据更多的比例
         gbc.gridx = 0;
@@ -357,6 +271,33 @@ public class TBParent extends JFrame{
     setVisible(true);
 }
 
+public void deleteButtonAction(ActionEvent e) {
+    JButton deleteButton = (JButton) e.getSource();
+    JButton editButton = (JButton)e.getSource();
+
+    int result = JOptionPane.showConfirmDialog(this, "Delete this task?", "delete confirm", JOptionPane.YES_NO_OPTION);
+    if (result == JOptionPane.YES_OPTION) {
+        // 弹出删除成功的对话框
+        JOptionPane acceptSuccessDialog = new JOptionPane("Delete successfully");
+        JDialog dialog = acceptSuccessDialog.createDialog(this, "Delete successfully");
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+
+        // 延迟一秒关闭对话框
+        Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                dialog.dispose(); // 关闭接受成功的对话框
+                deleteButton.setText("Have Deleted");
+                deleteButton.setEnabled(false); // 设置按钮不可点击
+                editButton.setEnabled(false);
+            }
+        });
+        timer.setRepeats(false); //定时器不重复执行
+        timer.start();
+    }
+}
+
 public static void main(String[] args) {
     
     SwingUtilities.invokeLater(() -> {
@@ -364,15 +305,4 @@ public static void main(String[] args) {
     });
     //TBCParentMethod newFrame = new TBCParentMethod();
 }
-
-//试下封到方法里再调用，试了不行
-public void method(){
-    try{
-            BufferedImage backgroundImage = ImageIO.read(new File("background.jpg"));
-        }catch (IOException e1) {
-        //  e1.printStackTrace();
-            System.out.println("很好，数据卡在文件里了，读不到java里");
-        } 
-}
-
 }

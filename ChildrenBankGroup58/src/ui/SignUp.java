@@ -1,12 +1,27 @@
-import javax.imageio.ImageIO;
+//javac -cp json-20210307.jar SignUp.java
+//java -cp .:json-20210307.jar SignUp
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.geom.Ellipse2D;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import java.nio.file.StandardOpenOption;
 
 public class SignUp extends JFrame {
     private JTextField nameField;
@@ -145,14 +160,52 @@ public class SignUp extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setOpaque(false);
     
-        // 创建提交按钮
+        // 创建提交按钮并实现json保存
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Implement submit action
-                JOptionPane.showMessageDialog(null, "Submit button clicked");
+        public void actionPerformed(ActionEvent e) {
+        // 获取输入数据
+            String name = nameField.getText();
+            String phoneNum = phoneNumField.getText();
+            String password = new String(passwordField.getPassword());
+            String confirmPassword = new String(confirmPasswordField.getPassword());
+
+        // 验证密码是否一致
+            if (!password.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(null, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        });
+
+        // 创建用户JSON对象
+            JSONObject user = new JSONObject();
+            user.put("name", name);
+            user.put("phoneNum", phoneNum);
+            user.put("password", password);  // 注意：在实际应用中，应对密码进行加密处理
+
+        // 保存用户信息到JSON文件
+            try {
+                File file = new File("user.json");
+                JSONArray usersArray;
+                if (file.exists()) {
+                // 文件存在，读取现有数据并转换为JSONArray
+                    String content = new String(Files.readAllBytes(Paths.get("user.json")));
+                    usersArray = new JSONArray(content);
+                } else {
+                // 文件不存在，创建新的JSONArray
+                    usersArray = new JSONArray();
+                }
+            // 添加新用户信息
+                usersArray.put(user);
+            // 写回文件
+                Files.write(Paths.get("user.json"), usersArray.toString(4).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                JOptionPane.showMessageDialog(null, "User registered successfully");
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Failed to save user data", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    });
+
         buttonPanel.add(submitButton);
     
         // 创建重置按钮
@@ -179,6 +232,3 @@ public class SignUp extends JFrame {
         });
     }
 }
-
-
-
