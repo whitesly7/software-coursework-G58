@@ -76,11 +76,11 @@ public class SavingAccount extends JFrame{
                 JLabel savingLabel = new JLabel(saving);
                 savingLabel.setForeground(Color.BLACK);
                 savingLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                savingLabel.addMouseListener(new MouseAdapter() {
+                /**savingLabel.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         JOptionPane.showMessageDialog(null, saving + " content goes here.");
                     }
-                });
+                });**/
                 savingLabel.setBounds(20, 50 + i * 30, 230, 30);
                 Saving2.add(savingLabel);
             }
