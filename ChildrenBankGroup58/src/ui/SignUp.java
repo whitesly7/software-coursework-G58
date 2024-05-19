@@ -1,5 +1,7 @@
-//javac -cp json-20210307.jar SignUp.java
-//java -cp .:json-20210307.jar SignUp
+/*
+    javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java LoginPage.java SignUp.java Home.java HelpPage.java SavingAccount.java HistoryPage.java
+    java -cp .:json-20210307.jar SignUp
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -11,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.geom.Ellipse2D;
@@ -162,49 +165,81 @@ public class SignUp extends JFrame {
     
         // 创建提交按钮并实现json保存
         JButton submitButton = new JButton("Submit");
+        
         submitButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-        // 获取输入数据
-            String name = nameField.getText();
-            String phoneNum = phoneNumField.getText();
-            String password = new String(passwordField.getPassword());
-            String confirmPassword = new String(confirmPasswordField.getPassword());
-
-        // 验证密码是否一致
-            if (!password.equals(confirmPassword)) {
-                JOptionPane.showMessageDialog(null, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-        // 创建用户JSON对象
-            JSONObject user = new JSONObject();
-            user.put("name", name);
-            user.put("phoneNum", phoneNum);
-            user.put("password", password);  // 注意：在实际应用中，应对密码进行加密处理
-
-        // 保存用户信息到JSON文件
-            try {
-                File file = new File("user.json");
-                JSONArray usersArray;
-                if (file.exists()) {
-                // 文件存在，读取现有数据并转换为JSONArray
-                    String content = new String(Files.readAllBytes(Paths.get("user.json")));
-                    usersArray = new JSONArray(content);
-                } else {
-                // 文件不存在，创建新的JSONArray
-                    usersArray = new JSONArray();
+            public void actionPerformed(ActionEvent e) {
+                // 获取输入数据
+                String name = nameField.getText();
+                String phoneNum = phoneNumField.getText();
+                String password = new String(passwordField.getPassword());
+                String confirmPassword = new String(confirmPasswordField.getPassword());
+                float currentBalance = 0;
+                float savingBalance = 0;
+                float fullBalance= currentBalance+savingBalance;
+        
+                // 验证密码是否一致
+                if (!password.equals(confirmPassword)) {
+                    JOptionPane.showMessageDialog(null, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-            // 添加新用户信息
-                usersArray.put(user);
-            // 写回文件
-                Files.write(Paths.get("user.json"), usersArray.toString(4).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                JOptionPane.showMessageDialog(null, "User registered successfully");
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Failed to save user data", "Error", JOptionPane.ERROR_MESSAGE);
+
+                // 读取现有用户信息
+                JSONArray userList = new JSONArray();
+                try {
+                    String jsonContent = new String(Files.readAllBytes(Paths.get("/Users/kimtan/Desktop/try/user.json")));
+                    userList = new JSONArray(jsonContent);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Failed to read user data", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+                // 获取当前最大id值
+                int maxId = 0;
+                for (int i = 0; i < userList.length(); i++) {
+                    JSONObject existingUser = userList.getJSONObject(i);
+                    int userId = existingUser.getInt("id");
+                    if (userId > maxId) {
+                        maxId = userId;
+                    }
+                }
+
+                // 检查电话号码是否已经注册过
+                for (int i = 0; i < userList.length(); i++) {
+                    JSONObject existingUser = userList.getJSONObject(i);
+                    String existingPhoneNum = existingUser.getString("phoneNum");
+                    if (existingPhoneNum.equals(phoneNum)) {
+                        JOptionPane.showMessageDialog(null, "Phone number already registered", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+                // 创建用户JSON对象
+                JSONObject user = new JSONObject();
+                user.put("id", maxId + 1); // 自动生成id
+                user.put("name", name);
+                user.put("phoneNum", phoneNum);
+                user.put("password", password);  
+                user.put("currentBalance", currentBalance);
+                user.put("savingBalance", savingBalance);
+                user.put("fullBalance", fullBalance);
+        
+                // 将新用户信息添加到用户列表中
+                userList.put(user);
+        
+                // 将更新后的用户列表写入JSON文件
+                try (FileWriter fileWriter = new FileWriter("/Users/kimtan/Desktop/try/user.json")) {
+                    fileWriter.write(userList.toString());
+                    JOptionPane.showMessageDialog(null, "User registered successfully");
+                    // 关闭注册窗口
+                    ((Window) SwingUtilities.getRoot(submitButton)).dispose();
+                    // 打开登陆页面
+                    new LoginPage();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Failed to save user data", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        }
-    });
+        });
+        
 
         buttonPanel.add(submitButton);
     

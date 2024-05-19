@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 public class HelpPage extends JFrame {
+    public int currentUserId;
     public HelpPage() {
         setTitle("Help Page");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -102,8 +103,9 @@ public class HelpPage extends JFrame {
             returnButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "Returning to homepage.");
+                    ((Window) SwingUtilities.getRoot(returnButton)).dispose();
                     // Add action to return to homepage
-                    new Home();
+                    new Home(currentUserId);
                 }
             });
             returnButton.setBounds(350, 380, 300, 50);

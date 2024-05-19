@@ -1,7 +1,6 @@
 /*
-	编译命令javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java
-    这样才能实现跳转
- 	运行命令java -cp .:json-20210307.jar TBParent
+	javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java LoginPage.java SignUp.java Home.java HelpPage.java SavingAccount.java HistoryPage.java
+    java -cp .:json-20210307.jar TBParent
  	运行前提注意：你需要保证json库和TBChild在同一个文件下
 */
 
@@ -17,19 +16,23 @@ import java.awt.event.MouseEvent;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.geom.Ellipse2D;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class TBParent extends JFrame{
+
     //TBCParentMethod tbc; // 创建TBCMethod的实例
     public TBParent() {
+
         setTitle("TBCParent");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 500);
@@ -52,12 +55,12 @@ public class TBParent extends JFrame{
         };
         panel.setLayout(new BorderLayout());
 
-        // 创建黄色标题栏
-        JPanel yellowPanel = new JPanel();
-        yellowPanel.setBackground(Color.YELLOW);
-        yellowPanel.setPreferredSize(new Dimension(getWidth(), 30));
+        // 创建蓝色标题栏
+        JPanel bluePanel = new JPanel();
+        bluePanel.setBackground(Color.BLUE);
+        bluePanel.setPreferredSize(new Dimension(getWidth(), 30));
         JLabel titleLabel = new JLabel("TASK BOARD");
-        yellowPanel.add(titleLabel);
+        bluePanel.add(titleLabel);
 
 
         // 创建上方区域面板(主区域)
@@ -73,7 +76,7 @@ public class TBParent extends JFrame{
 		JLabel avatarLabel = new JLabel(scaledIcon);
 
         // 创建中间提示栏
-        JLabel promptLabel = new JLabel("Find some tasks to do and earn yourself!");
+        JLabel promptLabel = new JLabel("Here are all of the tasks!");
         promptLabel.setFont(promptLabel.getFont().deriveFont(24.0f)); // 设置字体大小为24
 		promptLabel.setHorizontalAlignment(SwingConstants.CENTER); // 设置水平居中对齐
 
@@ -144,15 +147,15 @@ public class TBParent extends JFrame{
    			String jsonContent = new String(Files.readAllBytes(Paths.get("tasks.json")), "UTF-8");
 
    			// 解析JSON
-    		JSONObject jsonObject = new JSONObject(jsonContent);
-    		JSONArray tasksArray = jsonObject.getJSONArray("tasks");
+    		JSONArray tasksArray = new JSONArray(jsonContent);
 
     		// 遍历任务数组并添加到橙色任务便签中
     		for (int i = 0; i < tasksArray.length(); i++) {
         		JSONObject taskObject = tasksArray.getJSONObject(i);
-       			String taskTitle = taskObject.getString("title");
-       			String taskDescription=taskObject.getString("description");
-                String taskLabel=taskObject.getString("labels");
+       			String taskTitle = taskObject.getString("taskName");
+       			String taskDescription=taskObject.getString("requirement");
+                String taskLabel=taskObject.getString("tag");
+                String taskAward=taskObject.getString("award");
 
         		// 创建任务便签面板
         		JPanel taskCard = new JPanel() {
@@ -231,7 +234,7 @@ public class TBParent extends JFrame{
     		}
 		} catch (IOException e) {
     	//	e.printStackTrace();
-    		System.out.println("很好，数据卡在文件里了，读不到java里");
+    		System.out.println("shift");
 		}
 
         
@@ -257,7 +260,7 @@ public class TBParent extends JFrame{
         upperPanel.add(taskPanel, gbc);
 
         // 将黄色标题栏、上方区域、下方区域面板添加到面板
-        panel.add(yellowPanel, BorderLayout.NORTH);
+        panel.add(bluePanel, BorderLayout.NORTH);
         panel.add(upperPanel, BorderLayout.CENTER);
         panel.add(lowerPanel, BorderLayout.SOUTH);
 
@@ -277,24 +280,41 @@ public void deleteButtonAction(ActionEvent e) {
 
     int result = JOptionPane.showConfirmDialog(this, "Delete this task?", "delete confirm", JOptionPane.YES_NO_OPTION);
     if (result == JOptionPane.YES_OPTION) {
-        // 弹出删除成功的对话框
-        JOptionPane acceptSuccessDialog = new JOptionPane("Delete successfully");
-        JDialog dialog = acceptSuccessDialog.createDialog(this, "Delete successfully");
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setVisible(true);
+        // 获取被点击任务卡上的信息
+        JPanel taskCard = (JPanel) deleteButton.getParent();
+        JLabel taskTitleLabel = (JLabel) taskCard.getComponent(0);
+        String taskTitle = taskTitleLabel.getText();
 
-        // 延迟一秒关闭对话框
-        Timer timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                dialog.dispose(); // 关闭接受成功的对话框
-                deleteButton.setText("Have Deleted");
-                deleteButton.setEnabled(false); // 设置按钮不可点击
-                editButton.setEnabled(false);
+        try {
+            // 读取 JSON 文件内容
+            String jsonContent = new String(Files.readAllBytes(Paths.get("/Users/kimtan/Desktop/try/tasks.json")), "UTF-8");
+            JSONArray tasksArray = new JSONArray(jsonContent);
+
+            // 遍历 JSON 数组，找到需要删除的任务
+            for (int i = 0; i < tasksArray.length(); i++) {
+                JSONObject taskObject = tasksArray.getJSONObject(i);
+                if (taskObject.getString("taskName").equals(taskTitle)) {
+                    tasksArray.remove(i); // 删除该任务对象
+                    break; // 找到并删除后跳出循环
+                }
             }
-        });
-        timer.setRepeats(false); //定时器不重复执行
-        timer.start();
+
+            // 将更新后的 JSON 数组写回 JSON 文件中
+            try (FileWriter fileWriter = new FileWriter("/Users/kimtan/Desktop/try/tasks.json")) {
+                fileWriter.write(tasksArray.toString());
+            }
+
+            // 弹出删除成功的对话框
+            JOptionPane.showMessageDialog(this, "Task deleted successfully", "Delete Successfully", JOptionPane.INFORMATION_MESSAGE);
+
+            // 刷新当前页面
+            dispose(); // 关闭当前页面
+            new TBParent(); // 重新打开 TBParent 页面
+
+        } catch (IOException | JSONException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to delete task", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
 
@@ -303,6 +323,5 @@ public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
         new TBParent();
     });
-    //TBCParentMethod newFrame = new TBCParentMethod();
 }
 }

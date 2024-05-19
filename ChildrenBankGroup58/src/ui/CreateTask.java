@@ -1,11 +1,26 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.awt.geom.Ellipse2D;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import java.nio.file.StandardOpenOption;
 
 public class CreateTask extends JFrame {
     private JTextField taskNameField;
@@ -147,10 +162,47 @@ public class CreateTask extends JFrame {
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Implement submit action
-                JOptionPane.showMessageDialog(null, "Submit button clicked");
-                ((Window) SwingUtilities.getRoot(submitButton)).dispose();
-                new TBParent();
+                //获取输入数据
+                String taskName=taskNameField.getText();
+                String requirement=requirementField.getText();
+                String tag=tagsField.getText();
+                String award=awardField.getText();
+                Boolean accept=false;
+                Boolean finish=false;
+
+                //创建Task的JSON对象
+                JSONObject task=new JSONObject();
+                task.put("taskName",taskName);
+                task.put("requirement",requirement);
+                task.put("tag",tag);
+                task.put("award",award);
+                task.put("accept",accept);
+                task.put("finish",finish);
+                
+                //读取现有task信息
+                JSONArray taskList=new JSONArray();
+                 // 保存用户信息到JSON文件
+                try{
+                    String jsonContent=new String(Files.readAllBytes(Paths.get("/Users/kimtan/Desktop/try/tasks.json")));
+                    taskList=new JSONArray(jsonContent);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Failed to save task data", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                taskList.put(task);
+                // 将更新后的用户列表写入JSON文件
+                try (FileWriter fileWriter = new FileWriter("/Users/kimtan/Desktop/try/tasks.json")) {
+                    fileWriter.write(taskList.toString());
+                    JOptionPane.showMessageDialog(null, "User registered successfully");
+                    // 关闭窗口
+                    ((Window) SwingUtilities.getRoot(submitButton)).dispose();
+                    // 打开parent页面
+                    new TBParent();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Failed to save tasks data", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         buttonPanel.add(submitButton);

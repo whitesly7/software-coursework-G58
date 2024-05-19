@@ -1,7 +1,6 @@
 /*
-	javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java LoginPage.java SignUp.java Home.java HelpPage.java SavingAccount.java
-    这样才能实现跳转
- 	运行命令java -cp .:json-20210307.jar LoginPage
+	javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java LoginPage.java SignUp.java Home.java HelpPage.java SavingAccount.java HistoryPage.java
+    java -cp .:json-20210307.jar LoginPage
  	运行前提注意：你需要保证json库和TBChild在同一个文件下
  	parent view进入密码为123456
 */
@@ -180,61 +179,50 @@ public class LoginPage extends JFrame {
         loginButton.setFont(new Font("Tahoma", Font.BOLD, 24)); // 设置字体为加粗
         
         //点击登陆按钮，跳转到主界面
-            loginButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e){
-                    // 获取输入的手机号和密码
-                    String phoneNum = phoneNumField.getText();
-                    String password = new String(passwordField.getPassword());
-            
-                    // 验证输入的手机号和密码是否正确
-                    if ("1234567890".equals(phoneNum) && "123456".equals(password)) {
-                        // 关闭登录窗口
-                        ((Window) SwingUtilities.getRoot(loginButton)).dispose();
-                        System.out.println("Login successful, opening main page...");
-                        // TODO: 打开主页面
-                        new Home(); 
-                    } else {
-                        // 显示错误消息
-                        JOptionPane.showMessageDialog(null, "Sorry, your Phone Number or Password may be wrong", "Login Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-        });
-
-        /*loginButton.addActionListener(new ActionListener() {
+        loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 // 获取输入的手机号和密码
                 String phoneNum = phoneNumField.getText();
                 String password = new String(passwordField.getPassword());
         
+                // 读取user.json库中的用户数据
+                JSONArray userList = new JSONArray();
                 try {
-                    // 读取用户信息的JSON文件
-                    String content = new String(Files.readAllBytes(Paths.get("user.json")));
-                    JSONObject jsonObject = new JSONObject(content);
-                    
-                    // 获取文件中的手机号和密码
-                    String storedPhoneNum = jsonObject.getString("phoneNum");
-                    String storedPassword = jsonObject.getString("password");
+                    String jsonContent = new String(Files.readAllBytes(Paths.get("/Users/kimtan/Desktop/try/user.json")));
+                    userList = new JSONArray(jsonContent);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Failed to read user data", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
         
-                    // 验证手机号和密码
-                    if (storedPhoneNum.equals(phoneNum) && storedPassword.equals(password)) {
-                        // 关闭登录窗口
-                        ((Window) SwingUtilities.getRoot(loginButton)).dispose();
-                        System.out.println("Login successful, opening main page...");
-                        // TODO: 打开主页面
-                        new Home(); 
-                    } else {
-                        // 显示错误消息
-                        JOptionPane.showMessageDialog(null, "Sorry, your Phone Number or Password may be wrong", "Login Error", JOptionPane.ERROR_MESSAGE);
+                // 遍历用户列表，查找匹配的用户
+                JSONObject currentUser = null;
+                int currentUserId = -1; // 初始化为-1，表示未找到匹配的用户
+                for (int i = 0; i < userList.length(); i++) {
+                    JSONObject user = userList.getJSONObject(i);
+                    if (user.getString("phoneNum").equals(phoneNum) && user.getString("password").equals(password)) {
+                        currentUser = user;
+                        currentUserId = currentUser.getInt("id"); // 获取当前用户的id
+                        break;
                     }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error reading user file", "File Error", JOptionPane.ERROR_MESSAGE);
-                } 
-            }
-        });*/
+                }
         
-
-       
+                // 验证用户是否登录成功
+                if (currentUser != null) {
+                    // 关闭登录窗口
+                    ((Window) SwingUtilities.getRoot(loginButton)).dispose();
+                    System.out.println("Login successful, opening main page...");
+                    
+                    // 在这里将currentUserId传递给Home页面，用于锁定用户
+                    new Home(currentUserId); // 将currentUserId传递给Home页面
+                } else {
+                    // 显示错误消息
+                    JOptionPane.showMessageDialog(null, "Sorry, your Phone Number or Password may be wrong", "Login Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
         // 创建注册按钮
         JButton registerButton = new JButton("Register");
         registerButton.setBackground(new Color(255, 165, 0, 0));

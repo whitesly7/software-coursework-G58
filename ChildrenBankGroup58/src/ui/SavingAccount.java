@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 public class SavingAccount extends JFrame{
+    public int currentUserId;
     public SavingAccount(){
         setTitle("Saving Account");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,7 +96,9 @@ public class SavingAccount extends JFrame{
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "Returning to homepage.");
                     // Add action to return to homepage
-                    
+                    // 关闭窗口
+                    ((Window) SwingUtilities.getRoot(returnButton)).dispose();
+                    new Home(currentUserId);
                 }
             });
             returnButton.setBounds(350, 380, 300, 50);

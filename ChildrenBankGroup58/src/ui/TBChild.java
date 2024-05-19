@@ -1,7 +1,6 @@
 /*
-	编译命令javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java
-    这样才能实现跳转
- 	运行命令java -cp .:json-20210307.jar TBChild
+	javac -cp json-20210307.jar TBParent.java AcceptedTasks.java TBChild.java CreateTask.java LoginPage.java SignUp.java Home.java HelpPage.java SavingAccount.java HistoryPage.java
+    java -cp .:json-20210307.jar TBChild
  	运行前提注意：你需要保证json库和TBChild在同一个文件下
  	parent view进入密码为123456
 */
@@ -35,6 +34,7 @@ import java.awt.event.ActionListener;
 */
 
 public class TBChild extends JFrame {
+    public int currentUserId;
     public TBChild() {
         setTitle("TBChild");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -121,14 +121,14 @@ public class TBChild extends JFrame {
    			String jsonContent = new String(Files.readAllBytes(Paths.get("tasks.json")), "UTF-8");
 
    			// 解析JSON
-    		JSONObject jsonObject = new JSONObject(jsonContent);
-    		JSONArray tasksArray = jsonObject.getJSONArray("tasks");
-
+    		JSONArray tasksArray = new JSONArray(jsonContent);
     		// 遍历任务数组并添加到橙色任务便签中
     		for (int i = 0; i < tasksArray.length(); i++) {
         		JSONObject taskObject = tasksArray.getJSONObject(i);
-       			String taskTitle = taskObject.getString("title");
-       			String taskDescription=taskObject.getString("description");
+       			String taskTitle = taskObject.getString("taskName");
+       			String taskDescription=taskObject.getString("requirement");
+                String taskLabel=taskObject.getString("tag");
+                String taskAward=taskObject.getString("award");
 
         		// 创建任务便签面板
         		JPanel taskCard = new JPanel() {
@@ -153,9 +153,9 @@ public class TBChild extends JFrame {
 
         		//任务卡排版
         		taskCard.setLayout(new GridBagLayout());
-        		JLabel taskLabel = new JLabel(taskTitle);
+        		JLabel taskLabel1 = new JLabel(taskTitle);
         		JLabel taskLabel2 = new JLabel(taskDescription);
-        		taskLabel.setFont(taskLabel.getFont().deriveFont(18.0f)); // 设置字体大小为18
+        		taskLabel1.setFont(taskLabel1.getFont().deriveFont(18.0f)); // 设置字体大小为18
         		taskLabel2.setFont(taskLabel2.getFont().deriveFont(17.0f)); // 设置字体大小为17
 				JButton acceptButton = new JButton("Accept");
 				acceptButton.addActionListener(this::AcceptButtonClick);//为Accept button设置监听方法
@@ -167,7 +167,7 @@ public class TBChild extends JFrame {
        			gbc2.weightx = 1.0;
         		gbc2.weighty = 0.5;
         		gbc2.anchor = GridBagConstraints.CENTER;
-      			taskCard.add(taskLabel, gbc2);
+      			taskCard.add(taskLabel1, gbc2);
 
       			//taskLabel2
 				gbc2.gridy = 1;
@@ -199,7 +199,7 @@ public class TBChild extends JFrame {
             // 关闭窗口
             ((Window) SwingUtilities.getRoot(backButton)).dispose();
             // 打开主页面
-            new Home();
+            new Home(currentUserId);
             }
         });
         // 将button加入下方区域面板
@@ -353,5 +353,3 @@ public static void main(String[] args) {
     });
 }
 }
-
-
